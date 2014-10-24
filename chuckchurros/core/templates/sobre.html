@@ -7,7 +7,28 @@
 		<h2>CHUCK CHURROS</h2>
 		<hr>
 		
-		<p>AAAAAAAAAAAAAAAAAAAAAAAAAAAAA</p>
+		<p>Nossa proposta &eacute; um blog com muito humor e informa&ccedil;&atilde;o.</p>
+		<br/><br/>
+		
+		<h3>Conhe&ccedil;a nossa equipe:</h3>
+		<br/><br/>
+		
+		<div class="col-md-8">	
+		{% for e in equipe %}
+			
+				<h3><img src="http://res.cloudinary.com/fighter/image/upload/c_thumb,g_face,r_max,h_110,w_100/v1413080453/{{e.foto}}.jpg" style="margin:5px 0px 15px;" alt="">&nbsp;&nbsp;{{e.nome}}</h3>
+				<p>
+					{{e.descricao}}
+				</p>			
+			
+			
+			<br/>
+			
+		{% empty %}
+			<p> Nenhum membro cadastrado </p>
+		{% endfor %}
+		</div>
+					
 	</div>
 
 {% endblock content%}

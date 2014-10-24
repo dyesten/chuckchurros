@@ -4,7 +4,7 @@ from django.core import serializers
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from chuckchurros.core.forms import ContatoForm
-from chuckchurros.core.models import Artigos, Contatos, RankingArtigo, AcessoArtigo
+from chuckchurros.core.models import Artigos, Contatos, RankingArtigo, AcessoArtigo, Equipe
 from django.db.models import Avg, Sum, Count
 from django.db import connection
 import json
@@ -76,7 +76,10 @@ def artigosMaisVotados(request):
 
 
 def sobre(request):
-	return render(request, 'sobre.html')
+	context = {
+		'equipe':Equipe.objects.all().order_by('dataCadastro'),
+		}
+	return render(request, 'sobre.html', context)
 
 
 def contato(request):
@@ -124,3 +127,4 @@ def classifica_artigo(request, pk, rk):
 	obj.save()
 
 	return HttpResponse('ok')
+	

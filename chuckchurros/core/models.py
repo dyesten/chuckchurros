@@ -62,3 +62,17 @@ class Contatos(models.Model):
 		db_table = "tb_contatos"
 		verbose_name = _('contato')
 		verbose_name_plural = _('contatos')
+
+
+class Equipe(models.Model):
+	foto = CloudinaryField('foto', null=True, blank=True)
+	nome = models.CharField(max_length=100, null=False, blank=False)
+	descricao = models.TextField()
+	dataCadastro = models.DateTimeField(auto_now_add=True)
+	
+	def __unicode__(self):
+		return self.nome
+	
+	class Meta:
+		verbose_name = _('membro')
+		verbose_name_plural = _('membros')
