@@ -38,4 +38,4 @@ class ContatosAdmin(admin.ModelAdmin):
 
 admin.site.register(Artigos, ArtigosAdmin)
 admin.site.register(Contatos, ContatosAdmin)
-admin.site.register(AcessoArtigo)
+#admin.site.register(AcessoArtigo)

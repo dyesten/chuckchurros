@@ -5,8 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from chuckchurros.core.forms import ContatoForm
 from chuckchurros.core.models import Artigos, Contatos, RankingArtigo, AcessoArtigo
-from django.db.models import Avg, Sum
-from django.db.models import Count
+from django.db.models import Avg, Sum, Count
 from django.db import connection
 import json
 
@@ -21,13 +20,6 @@ def enviarEmailComentario(obj):
 
 
 def home(request):
-	'''context = { "artigos":Artigos.objects.raw('select a.id, a.titulo, a.slug, a.artigo, a.dataCadastro, a.dataAlteracao, ac.qtd_visualizacao from tb_artigos a '+
-												'left join (select artigos_id, count(1) as qtd_visualizacao '+
-															'from tb_acesso_artigos group by artigos_id) ac on a.id = ac.artigos_id order by dataCadastro desc'),
-	'''
-	
-	#x = Artigos.objects.select_related('AcessoArtigo').annotate(qtd_visualizacao=Count('acessoartigo')).order_by('-dataCadastro')[:5]
-	#print x.query
 	context = { "artigos":Artigos.objects.select_related('AcessoArtigo').annotate(qtd_visualizacao=Count('artigos_id')),
 			  }
 	return render(request, 'index.html', context)
@@ -53,19 +45,6 @@ def artigosRecentes(request):
 
 
 def artigosMaisAcessados(request):
-	
-	'''cursor = connection.cursor()
-	cursor.execute('select a.id, a.titulo, a.slug, ac.qtd_visualizacao from tb_artigos a '+
-							 'left join (select artigos_id, count(DISTINCT pcUsuario) as qtd_visualizacao '+
-							 'from tb_acesso_artigos group by artigos_id) ac on a.id = ac.artigos_id '+
-							 'order by qtd_visualizacao desc')
-	row = dictfetchall(cursor)
-	row = json.dumps(row, ensure_ascii=False)
-	cursor.close()
-	return HttpResponse(row, content_type='application/json')
-	'''
-	
-	
 	ac = Artigos.objects.select_related('AcessoArtigo').annotate(Count('artigos_id')).order_by('-artigos_id__count')[:5]
 	json = '{"json":['
 	
@@ -90,24 +69,7 @@ def artigosMaisVotados(request):
 	cursor.close()
 	return HttpResponse(row, content_type='application/json')
 	'''
-	#mv = Artigos.objects.select_related('RankingArtigo').annotate(Sum('id_artigo'))[:5]
-	#mv = Artigos.objects.select_related('RankingArtigo').annotate(Sum('rankingartigo_ranking'))[:5]
-	
-	#http://stackoverflow.com/questions/7907252/django-orm-select-with-join
-	#http://stackoverflow.com/questions/25437078/orm-left-join-query-and-sum
-	'''
-	r = Artigos.objects.all()
-	values = RankingArtigo.objects.filter(idArtigo=r).select_related().annotate(Sum('ranking'))
-	print values
-	for i in values:
-		print i.artigos_slug
-	'''
-	
-	'''
-	mv = RankingArtigo.objects.select_related(Artigos).annotate(Sum('ranking')).order_by('-ranking__sum')[:5]
-	print mv[0].slug
-	'''
-	
+		
 	rec = Artigos.objects.order_by('-dataCadastro')[:5]
 	return serializeJson(rec)
 	
@@ -142,12 +104,12 @@ def artigo(request, slug):
 	objArt = Artigos.objects.filter(slug=slug)[0];
 	obj = AcessoArtigo.objects.create(artigos_id=objArt.id,
 										ipUsuario = request.META['REMOTE_ADDR'], 
-										pcUsuario = request.META['REMOTE_HOST']
+										pcUsuario = request.META['SERVER_NAME']
 										)
 	obj.save()
 	context = { 'artigos':objArt,
 				'ranking':RankingArtigo.objects.filter(idArtigo=objArt.id).aggregate(Sum('ranking'), Avg('ranking')),
-				'avaliar':RankingArtigo.objects.filter(ipUsuario = request.META['REMOTE_ADDR'], pcUsuario = request.META['REMOTE_HOST'], idArtigo=objArt.id),}
+				'avaliar':RankingArtigo.objects.filter(ipUsuario = request.META['REMOTE_ADDR'], pcUsuario = request.META['SERVER_NAME'], idArtigo=objArt.id),}
 	return render(request, 'exibeArtigo.html', context)
 	
 
@@ -157,7 +119,7 @@ def classifica_artigo(request, pk, rk):
 	obj = RankingArtigo.objects.create(idArtigo_id=pk, 
 										ranking=int(rk), 
 										ipUsuario = request.META['REMOTE_ADDR'], 
-										pcUsuario = request.META['REMOTE_HOST']
+										pcUsuario = request.META['SERVER_NAME']
 										)
 	obj.save()
 
