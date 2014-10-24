@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content%}
+			
+	<div class="col-md-8">			
+		<h1>Obrigado <i>{{ contato.nome}}</i>!!</h1>
+		<p>
+			Retornaremos em breve nos contatos que deixou: <br/>
+			<li><strong>Telefone:</strong> {{contato.telefone }}</li>
+			<li><strong>Email:</strong> {{contato.email}}</li>
+			<br/><strong>Chuck Churros</strong> agradece seu contato.
+		</p>		
+	</div>
+
+{% endblock content%}

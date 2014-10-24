@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content%}
+
+	<div class="col-md-8">
+	
+		
+			<h2>
+				<a href="#">{{ artigos.titulo|upper }}</a>
+			</h2>
+			
+			<p class="lead">
+				por {{artigos.user}}
+			</p>
+			
+			<p><span class="glyphicon glyphicon-time"></span> 
+				Postado em {{artigos.dataAlteracao|date:"d"}} de {{artigos.dataAlteracao|date:"F"}} de {{artigos.dataAlteracao|date:"Y"}} as {{artigos.dataAlteracao|time:"H:i"}}
+			</p>
+			<hr>
+			
+			<p>{{artigos.artigo|safe}}</p>
+			
+			<hr>
+			
+			<!--http://www.jqueryrain.com/?d8VUtmAN-->
+			{% if avaliar %}
+				<span>Obrigado por avaliar.</span>
+				<br/><span>Avaliacao total: {{ranking.ranking__sum|add:"0"}}</span>
+				<input id="input-6a" class="rating form-control" data-size="xs" data-step="1" data-max="5" data-min="0" value="{{ ranking.ranking__avg|add:'0' }}" disabled />
+				
+
+			{% else %}
+				{% if ranking.ranking__sum %}
+					<br/><span>Avaliacao total: {{ranking.ranking__sum}}</span>
+				{%endif %}
+				<input id="input-6a" class="rating form-control" data-size="xs" data-step="1" data-max="5" data-min="0" >
+			{% endif %}
+			
+			
+			<div class="fb-like" data-href="http://chuckchurros.herokuapp.com/{{ request.get_full_path|urlencode }}" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+			<div class="fb-comments" data-href="http://chuckchurros.herokuapp.com/{{ request.get_full_path|urlencode }}" data-numposts="40" data-colorscheme="light"></div>
+			
+			
+	
+	</div>
+
+{% endblock content%}
+
+{% block script%}
+<script>
+	$(document).ready(function(){
+		$("#input-6a").on("rating.change", function(event, value, caption) {
+			$.ajax({
+				url: '/classifica_artigo/{{artigos.id|add:"0"}}/'+value+'/',
+				type: 'get',
+				success: function(data){
+					location.reload(true);
+				}
+			});	
+		});
+	});
+</script>
+{% endblock script%}

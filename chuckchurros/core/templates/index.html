@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content%}
+
+<div class="col-md-8">
+	
+	{% for a in artigos %}
+		<h2>
+			<a href="/artigo/{{a.slug}}">{{ a.titulo|upper }}</a>			
+		</h2>
+		<p class="lead"><span class="glyphicon glyphicon-user"></span>
+			por {{a.user}}
+		</p>
+
+
+		<p><span class="glyphicon glyphicon-time"></span> 
+			Postado em {{a.dataAlteracao|date:"d"}} de {{a.dataAlteracao|date:"F"}} de {{a.dataAlteracao|date:"Y"}} as {{a.dataAlteracao|time:"H:i"}}&nbsp;&nbsp;
+			<span class="glyphicon glyphicon-eye-open"></span>
+			{% if a.qtd_visualizacao == 1 %}
+				{{a.qtd_visualizacao}} Visualização
+			{% elif a.qtd_visualizacao > 1 %}
+				{{a.qtd_visualizacao}} Visualizações
+			{% else %}
+				0 Visualizações
+			{% endif %}
+		</p>
+		<!--<p><span style="color:blue;"><fb:comments-count href=http://chuckchurros.herokuapp.com/artigo/{{a.slug}}></fb:comments-count> comentarios</span></p>-->
+		<hr>
+		
+		<p>{{a.artigo|safe|truncatewords:50}}</p>
+		<a class="btn btn-primary" href="/artigo/{{a.slug}}">Mais <span class="glyphicon glyphicon-chevron-right"></span></a>
+
+		<hr>
+	{% empty %}
+		<p>Nenhum artigo cadastrado.</p>
+	{% endfor %}
+
+	
+	<!-- Pager -->
+	<ul class="pager">
+		<li class="previous">
+			<a href="#">&larr; Older</a>
+		</li>
+		<li class="next">
+			<a href="#">Newer &rarr;</a>
+		</li>
+	</ul>
+
+</div>
+{% endblock content%}

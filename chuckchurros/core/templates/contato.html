@@ -1,0 +1,51 @@
+﻿{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content%}
+
+<h1>Contato</h1>
+<h4>Que tal compartilhar sua receita preferida?</h4>
+<hr>
+	
+<div class="col-md-8">	
+	<form action="." id="form_contato" method="POST" style="display:block;">
+	  <fieldset>
+		
+		{% csrf_token %}    
+		  {{ form.non_field_errors }}
+
+				
+			<p>
+				<label for="{{form.nome.id_for_label}}">{{ form.nome.label|upper }}</label>
+				{{ form.nome|add_class:"form-control"|attr:"placeholder:Seu Nome"}}
+				{{ form.nome.errors }}
+			</p>
+
+
+			<p>
+				<label for="{{form.email.id_for_label}}">{{ form.email.label|upper }}</label>
+				{{ form.email|add_class:"form-control"|attr:"placeholder:Email"}}
+				{{ form.email.errors }}
+			</p>
+
+			<p>
+				<label for="{{form.telefone.id_for_label}}">{{ form.telefone.label|upper }}</label>
+				{{ form.telefone|add_class:"form-control"|attr:"placeholder:Telefone"}}
+				{{ form.telefone.errors }}
+			</p>
+
+			<p>
+				<label for="{{form.comentario.id_for_label}}">{{ form.comentario.label|upper }}</label>
+				{{ form.comentario|add_class:"form-control"|attr:"placeholder:Comentario"}}
+				{{ form.comentario.errors }}
+			</p>
+						
+			<p>
+				<input type="submit" value="Enviar" name="submit" id="submitButton" class="btn btn-info pull-right" title="Clique para enviar sua mensagem" />
+			</p>
+		
+		</fieldset>
+	</form>
+</div>
+
+{% endblock content%}
