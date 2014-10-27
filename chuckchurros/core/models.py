@@ -5,9 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 from tinymce.models import HTMLField
 
 from cloudinary.models import CloudinaryField
-
 from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^cloudinary\.models\.CloudinaryField"])
+
+from chuckchurros.core.managers import ArtigosManager, EquipeManager
+
 
 class Artigos(models.Model):
 	titulo = models.CharField(max_length=250)
@@ -16,6 +18,7 @@ class Artigos(models.Model):
 	user = models.ForeignKey(User)
 	dataCadastro = models.DateTimeField(auto_now_add=True)
 	dataAlteracao = models.DateTimeField(auto_now=True)
+	objects = ArtigosManager()
 	
 	def __unicode__(self):
 		return self.titulo
@@ -58,10 +61,15 @@ class Contatos(models.Model):
 	def __unicode__(self):
 		return self.nome		
 	
+	@models.permalink
+	def get_absolute_url(self):
+		return ('core:contato_sucesso', (), {'pk':self.pk})
+		
 	class Meta:
 		db_table = "tb_contatos"
 		verbose_name = _('contato')
 		verbose_name_plural = _('contatos')
+	
 
 
 class Equipe(models.Model):
@@ -69,6 +77,8 @@ class Equipe(models.Model):
 	nome = models.CharField(max_length=100, null=False, blank=False)
 	descricao = models.TextField()
 	dataCadastro = models.DateTimeField(auto_now_add=True)
+	
+	objects = EquipeManager()
 	
 	def __unicode__(self):
 		return self.nome

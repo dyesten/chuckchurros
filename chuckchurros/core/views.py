@@ -3,12 +3,14 @@ from django.core.mail import send_mail
 from django.core import serializers
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
-from chuckchurros.core.forms import ContatoForm
-from chuckchurros.core.models import Artigos, Contatos, RankingArtigo, AcessoArtigo, Equipe
+from django.views.generic import DetailView, TemplateView, CreateView
 from django.db.models import Avg, Sum, Count
 from django.db import connection
-import json
+#import json
 
+
+from chuckchurros.core.forms import ContatoForm
+from chuckchurros.core.models import Artigos, Contatos, RankingArtigo, AcessoArtigo, Equipe
 
 
 def enviarEmailComentario(obj):	
@@ -20,11 +22,10 @@ def enviarEmailComentario(obj):
 
 
 def home(request):
-	context = { "artigos":Artigos.objects.select_related('AcessoArtigo').annotate(qtd_visualizacao=Count('artigos_id')),
-			  }
+	context = { "artigos":Artigos.objects.qtdVisualizacao,}
 	return render(request, 'index.html', context)
 
-
+'''
 def dictfetchall(cursor):
 	"Returns all rows from a cursor as a dict"
 	desc = cursor.description
@@ -32,7 +33,7 @@ def dictfetchall(cursor):
 		dict(zip([col[0] for col in desc], row))
 		for row in cursor.fetchall()[0:5]
     ]
-
+'''
 
 def serializeJson(obj):
 	obj = serializers.serialize('json', obj)
@@ -41,19 +42,17 @@ def serializeJson(obj):
 
 def artigosRecentes(request):
 	rec = Artigos.objects.order_by('-dataCadastro')[:5]
+	#rec = Artigos.objects.top5Recentes
+	
 	return serializeJson(rec)
 
 
 def artigosMaisAcessados(request):
 	ac = Artigos.objects.select_related('AcessoArtigo').annotate(Count('artigos_id')).order_by('-artigos_id__count')[:5]
-	json = '{"json":['
+	#ac = Artigos.top5Acessadas.all()
 	
-	for s in ac:
-		json += '{"slug":"' + s.slug + '", "titulo":"'+s.titulo+'", "qtd_visualizacao":'+str(s.artigos_id__count)+'}, '
-	if ac:
-		json = json[0:len(json)-2]+']}'
-	else:
-		json +=']}'
+	json = '{"json":['+''.join('{"slug":"' + s.slug + '", "titulo":"'+s.titulo+'", "qtd":'+str(s.artigos_id__count)+'}, ' for s in ac)	
+	json = json[0:len(json)-2]+']}' if ac else json+']}'
 	
 	return HttpResponse(json, content_type='application/text')
 
@@ -74,34 +73,16 @@ def artigosMaisVotados(request):
 	return serializeJson(rec)
 	
 
-
 def sobre(request):
-	context = {
-		'equipe':Equipe.objects.all().order_by('dataCadastro'),
-		}
-	return render(request, 'sobre.html', context)
+	return render(request, 'sobre.html', {'equipe':Equipe.objects.membros})
 
 
-def contato(request):
-	if request.method == 'POST':
-		form = ContatoForm(request.POST)
-		if not form.is_valid():
-			return render(request, 'contato.html', {'form':form} )
+class ContatoCreate(CreateView):
+	model = Contatos
+	form_class = ContatoForm
 
-		obj = form.save()
-		enviarEmailComentario(obj)
-		return HttpResponseRedirect('/contato_sucesso/%d/' % obj.pk)
-		
-	else:
-		context = {'form':ContatoForm()}
-		return render(request, 'contato.html',  context)
-
-
-def contato_sucesso(request, pk):
-	contato = get_object_or_404(Contatos, pk=pk)
-	context = {'contato':contato}
-	return render(request, 'contato_sucesso.html', context)
-	
+class ContatoSucesso(DetailView):
+	model = Contatos
 
 def artigo(request, slug):
 	objArt = Artigos.objects.filter(slug=slug)[0];
@@ -125,6 +106,4 @@ def classifica_artigo(request, pk, rk):
 										pcUsuario = request.META['SERVER_NAME']
 										)
 	obj.save()
-
 	return HttpResponse('ok')
-	

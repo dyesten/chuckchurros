@@ -2,16 +2,18 @@
 from django.test import TestCase
 from chuckchurros.core.models import Contatos
 from chuckchurros.core.forms import ContatoForm
+from django.core.urlresolvers import reverse as r
 
 class ContatosTest(TestCase):
 	def setUp(self):
 		self.resp = self.client.get('/contato/')
-	
+		#self.resp = self.client.get(r('core:contato'))
+
 	def test_get(self):
 		self.assertEqual(200, self.resp.status_code)
 	
 	def test_template(self):
-		self.assertTemplateUsed(self.resp, 'contato.html')
+		self.assertTemplateUsed(self.resp, 'core/contatos_form.html')
 	
 	def test_fields(self):
 		form = ContatoForm()
@@ -52,8 +54,9 @@ class ContatoSucessoTest(TestCase):
 		self.assertEqual(200, self.resp.status_code)
 	
 	def test_template(self):
-		self.assertTemplateUsed(self.resp, 'contato_sucesso.html')
+		self.assertTemplateUsed(self.resp, 'core/contatos_detail.html')
 	
 	def test_not_found(self):
 		response = self.client.get('/contato_sucesso/abc/')
 		self.assertEqual(404, response.status_code)
+		

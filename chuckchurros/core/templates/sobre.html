@@ -2,7 +2,6 @@
 {% load widget_tweaks %}
 
 {% block content%}
-
 	<div class="col-md-8">
 		<h2>CHUCK CHURROS</h2>
 		<hr>
@@ -15,13 +14,13 @@
 		
 		<div class="col-md-8">	
 		{% for e in equipe %}
-			
-				<h3><img src="http://res.cloudinary.com/fighter/image/upload/c_thumb,g_face,r_max,h_110,w_100/v1413080453/{{e.foto}}.jpg" style="margin:5px 0px 15px;" alt="">&nbsp;&nbsp;{{e.nome}}</h3>
-				<p>
-					{{e.descricao}}
-				</p>			
-			
-			
+				{% if e.foto %}
+					<h3><img src="http://res.cloudinary.com/fighter/image/upload/c_thumb,g_face,r_max,h_110,w_100/v1413080453/{{e.foto}}.jpg" style="margin:5px 0px 15px;" alt="">&nbsp;&nbsp;{{e.nome}}</h3>
+				{% else %}
+					<h3>&nbsp;&nbsp;{{e.nome}}</h3>
+				{% endif %}
+
+				<p>{{e.descricao}}</p>
 			<br/>
 			
 		{% empty %}
@@ -30,5 +29,4 @@
 		</div>
 					
 	</div>
-
 {% endblock content%}
